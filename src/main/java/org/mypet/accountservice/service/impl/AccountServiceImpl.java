@@ -1,7 +1,6 @@
 package org.mypet.accountservice.service.impl;
 
 import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.mypet.accountservice.dto.CreateAccountRequestDto;
 import org.mypet.accountservice.entity.Account;
@@ -26,10 +25,10 @@ public class AccountServiceImpl implements AccountService {
     public void performTransfer(UUID senderAccountId, UUID clientId, UUID receiverAccountId, BigDecimal amount) {
         Account sender = accountRepository.findByAccountIdAndClientId(senderAccountId, clientId)
                 .orElseThrow(() -> new AccountNotFoundException(
-                        String.format("Account with id %s not found", senderAccountId)));
+                        String.format("Account with sender-id %s not found", senderAccountId)));
         Account receiver = accountRepository.findById(receiverAccountId)
                 .orElseThrow(() -> new AccountNotFoundException(
-                        String.format("Account with id %s not found", receiverAccountId)));
+                        String.format("Account with receiver-id %s not found", receiverAccountId)));
 
         checkBalance(sender, receiver, amount);
 

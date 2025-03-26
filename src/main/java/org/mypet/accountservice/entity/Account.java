@@ -1,13 +1,18 @@
 package org.mypet.accountservice.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
@@ -27,9 +32,6 @@ public class Account {
     @Column(name = "account_id")
     private UUID accountId;
 
-    @Column(name = "clientid", nullable = false)
-    private UUID clientId;
-
     @Column(name = "account_name")
     private String accountName;
 
@@ -44,4 +46,10 @@ public class Account {
 
     @Column(name = "open_date")
     private LocalDateTime openDate;
+
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "client_id", nullable = false)
+    private Client client;
 }
