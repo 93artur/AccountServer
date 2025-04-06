@@ -3,10 +3,12 @@ package org.mypet.accountservice.service.impl;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.mypet.accountservice.dto.CreateAccountRequestDto;
+import org.mypet.accountservice.dto.TransferAccountDto;
 import org.mypet.accountservice.entity.Account;
 import org.mypet.accountservice.exception.AccountIsClosedException;
 import org.mypet.accountservice.exception.AccountNotFoundException;
 import org.mypet.accountservice.exception.NotEnoughBalanceException;
+import org.mypet.accountservice.kafka.AccountProducer;
 import org.mypet.accountservice.repository.AccountRepository;
 import org.mypet.accountservice.service.AccountService;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,8 @@ import java.util.UUID;
 public class AccountServiceImpl implements AccountService {
 
     private final AccountRepository accountRepository;
+    private final AccountProducer accountProducer;
+    private final String MESSAGE = "Был выполнен перевод на сумму %s, со счета %s на счет %Ss";
 
     @Transactional
     @Override
@@ -37,6 +41,13 @@ public class AccountServiceImpl implements AccountService {
 
         accountRepository.setBalance(sender.getAccountId(), senderResultBalance);
         accountRepository.setBalance(receiver.getAccountId(), receiverResultBalance);
+
+        TransferAccountDto dto = TransferAccountDto.builder()
+                .email("recipient_mail@gmail.com")
+                .transferInfo(String.format(MESSAGE, amount.toString(), senderAccountId.toString(), receiverAccountId.toString()))
+                .build();
+
+        accountProducer.sendMessage(dto);
     }
 
     @Override
